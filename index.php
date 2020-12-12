@@ -61,6 +61,60 @@ switch ($action) {
         break;
     }
 
+    case 'register':{
+        $userId = filter_input(INPUT_POST, 'userId');
+        $email = filter_input(INPUT_POST, 'email');
+        $fname = filter_input(INPUT_POST, 'fname');
+        $lname = filter_input(INPUT_POST, 'lname');
+        $birthday = filter_input(INPUT_POST, 'birthday');
+        $password = filter_input(INPUT_POST, 'password');
+
+        $conditions_met = 1;
+        //Cant be empty
+        if (strlen($fname) == 0) {
+            $error = 'First name should not be left empty';
+            $conditions_met = 0;
+        }
+
+        //Cant be empty
+        if (strlen($lname) == 0){
+            $error = 'Last name should not be left empty';
+            $conditions_met = 0;
+        }
+
+        //Cant be empty
+        if (strlen($birthday) == 0) {
+            $error = 'Birthday should not be left empty';
+            $conditions_met = 0;
+        }
+
+        //Cant be empty & contains @ character
+        if (strlen($email) == 0){
+            $error = 'Email should not be left empty';
+            $conditions_met = 0;
+        }elseif (strpos($email, "@") != TRUE){
+            $error = 'Email should contain @ character';
+            $conditions_met = 0;
+        }
+
+        //Cant be empty & at least 8 character
+        if ((strlen($password) == 0)){
+            $error = 'Password should not be left empty';
+            $conditions_met = 0;
+        }elseif ((strlen($password) < 8)){
+             $error = 'Password must be atleast 8 characters long';
+            $conditions_met = 0;
+        }
+
+        if ($conditions_met ==0) {
+            include('errors/error.php');
+        } else {
+            register_new_user($email, $fname, $lname, $birthday, $password);
+            header("Location: .?action=display_questions&userId=$userId");
+        }
+        break;
+    }
+
     case 'display_questions': {
         $userId = filter_input(INPUT_GET, 'userId');
         $listType = filter_input(INPUT_GET, 'listType');
@@ -87,7 +141,11 @@ switch ($action) {
         break;
     }
 
-    case 'submit_question': {
+    case 'display_new_question':{
+        break;
+    }
+
+    case 'create_new_question': {
         $userId = filter_input(INPUT_POST, 'userId');
         $email = filter_input(INPUT_POST, 'email');
         $title = filter_input(INPUT_POST, 'title');
