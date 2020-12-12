@@ -30,15 +30,24 @@ function get_all_questions () {
 function create_question ($title, $body, $skills, $ownerid) {
     global $db;
 
-    $query = 'INSERT INTO questions
-                (title, body, skills, ownerid)
-              VALUES
-                (:title, :body, :skills, :ownerid)';
+    $cdate = date("Y-m-d-h:m:s");
+
+    $q = 'SELECT * FROM accounts WHERE id = :ownerid';
+    $s1 = $db->prepare($q);
+    $s1->bindValue(':ownerid', $ownerid);
+    $s1->execute();
+    $val = $s1->fetch();
+
+
+    $query = 'INSERT INTO questions (owneremail, ownerid, createddate, title, body, skills) VALUES (:email, :ownerid, :cdate, :title, :body, :skills)';
     $statement = $db->prepare($query);
+    $statement->bindValue(':email', $val['email']);
+    $statement->bindValue(':ownerid', $ownerid);
+    $statement->bindValue(':cdate', $cdate);
     $statement->bindValue(':title', $title);
     $statement->bindValue(':body', $body);
     $statement->bindValue(':skills', $skills);
-    $statement->bindValue(':ownerid', $ownerid);
+
     $statement->execute();
     $statement->closeCursor();
 }
